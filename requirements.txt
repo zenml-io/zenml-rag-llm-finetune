@@ -9,3 +9,6 @@ nvidia-cuda-runtime-cu12==12.1.105
 datasets==2.14.7
 transformers==4.31.0
 accelerate==0.24.1
+plotly
+scikit-learn
+tenacity
