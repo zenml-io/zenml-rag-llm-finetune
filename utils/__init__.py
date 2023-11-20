@@ -15,4 +15,18 @@
 # limitations under the License.
 #
 
-from .embedding_utils import get_embedding, cosine_similarity
+from .embedding_utils import (
+    get_embedding,
+    aget_embedding,
+    get_embeddings,
+    aget_embeddings,
+    cosine_similarity,
+    plot_multiclass_precision_recall,
+    distances_from_embeddings,
+    indices_of_nearest_neighbors_from_distances,
+    pca_components_from_embeddings,
+    tsne_components_from_embeddings,
+    chart_from_components,
+    chart_from_components_3D,
+)
+from .misc import compute_metrics, find_max_length
