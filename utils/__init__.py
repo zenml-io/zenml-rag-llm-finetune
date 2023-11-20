@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-from .embedding_utils import (
+from .embeddings_utils import (
     get_embedding,
     aget_embedding,
     get_embeddings,
