@@ -12,3 +12,5 @@ accelerate==0.24.1
 plotly
 scikit-learn
 tenacity
+matplotlib
+openai
