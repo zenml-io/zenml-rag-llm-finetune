@@ -163,19 +163,4 @@ cython_debug/
 *.zen
 .DS_store
 
-gradio/model/
-gradio/tokenizer/
-gradio/config.json
-gradio/merges.txt
-gradio/predict.py
-gradio/pytorch_model.bin
-gradio/special_tokens_map.json
-gradio/tokenizer.json
-gradio/tokenizer_config.json
-gradio/vocab.json
-gradio/flagged/
-
-gradio/model.safetensors
-zenml_artifact/
-gradio/vocab.txt
-.idea
+data/

@@ -9,17 +9,18 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import average_precision_score, precision_recall_curve
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
-import openai
+import openai as openailib
 import numpy as np
 import pandas as pd
 
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 def get_embedding(text: str, model="text-similarity-davinci-001", **kwargs) -> List[float]:
-
+    print(text)
     # replace newlines, which can negatively affect performance.
     text = text.replace("\n", " ")
 
+    openai = openailib.OpenAI()
     response = openai.embeddings.create(input=[text], model=model, **kwargs)
 
     return response.data[0].embedding
@@ -33,6 +34,7 @@ async def aget_embedding(
     # replace newlines, which can negatively affect performance.
     text = text.replace("\n", " ")
 
+    openai = openailib.OpenAI()
     return (await openai.embeddings.create(input=[text], model=model, **kwargs))["data"][0][
         "embedding"
     ]
@@ -47,6 +49,7 @@ def get_embeddings(
     # replace newlines, which can negatively affect performance.
     list_of_text = [text.replace("\n", " ") for text in list_of_text]
 
+    openai = openailib.OpenAI()
     data = openai.embeddings.create(input=list_of_text, model=model, **kwargs).data
     return [d.embedding for d in data]
 
@@ -60,6 +63,7 @@ async def aget_embeddings(
     # replace newlines, which can negatively affect performance.
     list_of_text = [text.replace("\n", " ") for text in list_of_text]
 
+    openai = openailib.OpenAI()
     data = (await openai.embeddings.create(input=list_of_text, model=model, **kwargs)).data
     return [d.embedding for d in data]
 
