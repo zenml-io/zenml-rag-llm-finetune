@@ -16,4 +16,5 @@
 #
 
 
-from .url_scraper import url_scraper
+from url_scraper import url_scraper
+from url_scraping_utils import get_all_pages, get_nested_readme_urls
