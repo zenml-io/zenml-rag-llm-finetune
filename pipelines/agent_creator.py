@@ -21,7 +21,7 @@ from steps.agent_creation.web_url_loader import web_url_loader
 from zenml import pipeline, get_pipeline_context
 from zenml.artifacts.external_artifact import ExternalArtifact
 from zenml.config import DockerSettings
-from zenml.integrations.constants import LANGCHAIN, OPEN_AI, PILLOW
+from zenml.integrations.constants import OPEN_AI, PILLOW
 from zenml.model.model_version import ModelVersion
 from sentence_transformers import SentenceTransformer
 
@@ -29,7 +29,7 @@ PIPELINE_NAME = "zenml_agent_creation_pipeline"
 
 docker_settings = DockerSettings(
     requirements="requirements.txt",
-    required_integrations=[LANGCHAIN, OPEN_AI, PILLOW],
+    required_integrations=[OPEN_AI, PILLOW],
 )
 
 
