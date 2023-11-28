@@ -13,10 +13,10 @@
 #  permissions and limitations under the License.
 
 from typing import List
-
-from langchain.docstore.document import Document
-from langchain.document_loaders import UnstructuredURLLoader
 from zenml import step
+
+from llama_index.schema import Document
+from llama_hub.web.unstructured_web import UnstructuredURLLoader
 
 
 @step(enable_cache=True)
@@ -32,4 +32,4 @@ def web_url_loader(urls: List[str]) -> List[Document]:
     loader = UnstructuredURLLoader(
         urls=urls,
     )
-    return loader.load()
+    return loader.load_data()

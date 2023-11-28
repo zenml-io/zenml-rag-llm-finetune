@@ -104,7 +104,7 @@ def get_all_pages(url: str, finetuning: bool = False) -> List[str]:
     Returns:
         List[str]: A list of all pages with the same base.
     """
-    logger.debug(f"Scraping all pages from {url}...")
+    logger.info(f"Scraping all pages from {url}...")
     base_url = urlparse(url).netloc
     pages = crawl(url, base_url, finetuning=finetuning)
     logger.debug(f"Found {len(pages)} pages.")

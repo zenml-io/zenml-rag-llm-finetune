@@ -3,7 +3,6 @@ from typing import Dict, List, Tuple
 import uuid
 
 from llama_index.llms import OpenAI
-from llama_index.schema import MetadataMode
 from tqdm.notebook import tqdm
 from zenml import step
 

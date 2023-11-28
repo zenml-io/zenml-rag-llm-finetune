@@ -1,26 +1,45 @@
 from zenml import pipeline
+from zenml.model.model_version import ModelVersion
 
-from steps.url_scraper import url_scraper
-from steps.corpus_loader import load_corpus
-from steps.data_merger import merge_data
-from steps.evaluator import create_evaluator
-from steps.finetune_embeddings import finetune_sentencetransformer_model
-from steps.query_generator import generate_queries
-from steps.training_examples import generate_training_examples
+from steps.finetune_pipeline.url_scraper.url_scraper import url_scraper
+from steps.finetune_pipeline.corpus_loader import load_corpus
+from steps.finetune_pipeline.data_merger import merge_data
+from steps.finetune_pipeline.evaluator import create_evaluator
+from steps.finetune_pipeline.finetune_embeddings import (
+    finetune_sentencetransformer_model,
+)
+from steps.finetune_pipeline.query_generator import generate_queries
+from steps.finetune_pipeline.training_examples import generate_training_examples
 
 
-@pipeline(name="finetuning_pipeline", enable_cache=True)
+@pipeline(
+    name="finetuning_pipeline",
+    enable_cache=True,
+    model_version=ModelVersion(
+        name="finetuned-sentence-transformer",
+        license="Apache",
+        description="Custom Embeddings model",
+        create_new_model_version=True,
+        delete_new_version_on_failure=True,
+    ),
+)
 def finetuning_pipeline(
     docs_url: str = "",
     repo_url: str = "",
     release_notes_url: str = "",
     website_url: str = "",
 ):
-    train_urls, val_urls = url_scraper.url_scraper(docs_url, repo_url, release_notes_url, website_url)
+    train_urls, val_urls = url_scraper(
+        docs_url, repo_url, release_notes_url, website_url
+    )
     train_corpus = load_corpus(train_urls, id="train_loader")
     val_corpus = load_corpus(val_urls, id="val_loader")
-    train_queries, train_relevant_docs = generate_queries(train_corpus, id="train_queries_generator")
-    val_queries, val_relevant_docs = generate_queries(val_corpus, id="val_queries_generator")
+    train_queries, train_relevant_docs = generate_queries(
+        train_corpus, id="train_queries_generator"
+    )
+    val_queries, val_relevant_docs = generate_queries(
+        val_corpus, id="val_queries_generator"
+    )
     train_dataset, val_dataset = merge_data(
         train_corpus,
         train_queries,
@@ -31,5 +50,8 @@ def finetuning_pipeline(
     )
     training_examples = generate_training_examples(train_dataset)
     evaluator = create_evaluator(val_dataset)
-    model = finetune_sentencetransformer_model(training_examples, evaluator)
-    
+    model = finetune_sentencetransformer_model(
+        loader=training_examples,
+        evaluator=evaluator,
+        model_id="paraphrase-albert-small-v2",
+    )
