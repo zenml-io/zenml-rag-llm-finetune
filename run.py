@@ -19,6 +19,7 @@ import os
 
 import click
 from zenml.logger import get_logger
+from zenml.model.model_version import ModelVersion
 
 from pipelines.finetune import finetuning_pipeline
 
@@ -132,6 +133,14 @@ def main(
 
     # Execute Feature Engineering Pipeline
     if finetune_pipeline:
+        model_version_config_finetune=ModelVersion(
+            name="finetuned-sentence-transformer",
+            license="Apache",
+            description="Custom Embeddings model",
+            create_new_model_version=True,
+            delete_new_version_on_failure=True,
+        )
+        pipeline_args["model_version"] = model_version_config_finetune
         # pipeline_args["config_path"] = os.path.join(config_folder, "feature_engineering_config.yaml")
         run_args_finetune = {
             "model_id": model_id,
@@ -145,7 +154,12 @@ def main(
 
     # Execute Training Pipeline
     if agent_creation_pipeline:
+        model_version_config_agent=ModelVersion(
+            name="finetuned-sentence-transformer",
+            version=model_version if model_version != 0 else None,
+        )
         # pipeline_args["config_path"] = os.path.join(config_folder, "trainer_config.yaml")
+        pipeline_args["model_version"] = model_version_config_agent
 
         run_args_agent = {
             "website_url": website_url,
