@@ -16,7 +16,7 @@ from typing import List
 
 from langchain.docstore.document import Document
 from langchain.embeddings import OpenAIEmbeddings
-from embedding.custom_hf_embedding import CustomBgeEmbeddings
+# from embedding.custom_hf_embedding import CustomBgeEmbeddings
 from langchain.text_splitter import (
     CharacterTextSplitter,
 )
@@ -27,10 +27,10 @@ from sentence_transformers import SentenceTransformer
 
 @step(enable_cache=True)
 def index_generator(
-    model: SentenceTransformer, documents: List[Document]
+    documents: List[Document]
 ) -> VectorStore:
-    embeddings = CustomBgeEmbeddings(model=model)
-
+    # embeddings = CustomBgeEmbeddings(model=model)
+    embeddings = OpenAIEmbeddings()
     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     compiled_texts = text_splitter.split_documents(documents)
 

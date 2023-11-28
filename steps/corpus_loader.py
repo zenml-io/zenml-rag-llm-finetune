@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from llama_index import SimpleWebPageReader
+from llama_index.readers import SimpleWebPageReader
 from llama_index.node_parser import SimpleNodeParser
 from zenml import step
 from llama_index.schema import MetadataMode

@@ -12,7 +12,7 @@
 #  or implied. See the License for the specific language governing
 #  permissions and limitations under the License.
 
-from typing import List
+from typing import Annotated, List, Tuple
 
 from steps.url_scraper.url_scraping_utils import get_all_pages, get_nested_readme_urls
 from zenml import step
@@ -24,7 +24,7 @@ def url_scraper(
     repo_url: str = "",
     release_notes_url: str = "",
     website_url: str = "",
-) -> List[str]:
+) -> Tuple[Annotated[List, "train_urls"], Annotated[List, "val_urls"]]:
     """Generates a list of relevant URLs to scrape.
 
     Args:
@@ -37,6 +37,14 @@ def url_scraper(
         List of URLs to scrape.
     """
     # examples_readme_urls = get_nested_readme_urls(repo_url)
-    docs_urls = get_all_pages(docs_url)
-    website_urls = get_all_pages(website_url)
-    return docs_urls + website_urls + [release_notes_url]
+    # docs_urls = get_all_pages(docs_url, finetuning=True)
+    # website_urls = get_all_pages(website_url, finetuning=True)
+    # all_urls = docs_urls + website_urls + [release_notes_url]
+
+    # # split into train and val sets
+    # train_urls = all_urls[: int(0.8 * len(all_urls))]
+    # val_urls = all_urls[int(0.8 * len(all_urls)) :]
+
+    return [website_url], [website_url]
+
+    return train_urls, val_urls

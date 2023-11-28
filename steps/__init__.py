@@ -15,10 +15,10 @@
 # limitations under the License.
 #
 
-from corpus_loader import load_corpus
-from data_merger import merge_data
-from evaluator import create_evaluator
-from finetune_embeddings import finetune_sentencetransformer_model
-from query_generator import generate_queries
-from training_examples import generate_training_examples
-from model_log_register import register_model
+from .corpus_loader import load_corpus
+from .data_merger import merge_data
+from .evaluator import create_evaluator
+from .finetune_embeddings import finetune_sentencetransformer_model
+from .query_generator import generate_queries
+from .training_examples import generate_training_examples
+# from .model_log_register import register_model

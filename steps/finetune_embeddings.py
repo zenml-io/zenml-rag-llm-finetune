@@ -26,6 +26,4 @@ def finetune_sentencetransformer_model(
         evaluation_steps=50,
     )
 
-    model.en
-
     return model
