@@ -47,6 +47,7 @@ def docs_to_agent_pipeline(
     repo_url: str = "",
     release_notes_url: str = "",
     website_url: str = "",
+    model_version: int = None
 ) -> None:
     """Generate index for ZenML.
 
@@ -55,6 +56,7 @@ def docs_to_agent_pipeline(
         repo_url: URL to the repository.
         release_notes_url: URL to the release notes.
         website_url: URL to the website.
+        model_version: Version of the model to be used.
     """
     urls = url_scraper(docs_url, repo_url, release_notes_url, website_url)
     documents = web_url_loader(urls)

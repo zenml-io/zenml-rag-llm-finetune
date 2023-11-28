@@ -28,6 +28,8 @@ def finetuning_pipeline(
     repo_url: str = "",
     release_notes_url: str = "",
     website_url: str = "",
+    model_id: str = "paraphrase-albert-small-v2",
+    num_epochs: int = 2,
 ):
     train_urls, val_urls = url_scraper(
         docs_url, repo_url, release_notes_url, website_url
@@ -53,5 +55,6 @@ def finetuning_pipeline(
     model = finetune_sentencetransformer_model(
         loader=training_examples,
         evaluator=evaluator,
-        model_id="paraphrase-albert-small-v2",
+        model_id=model_id,
+        EPOCHS=num_epochs,
     )

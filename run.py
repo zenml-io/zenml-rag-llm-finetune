@@ -16,21 +16,11 @@
 #
 
 import os
-from datetime import datetime as dt
-from typing import Optional
 
 import click
-from zenml.client import Client
-from zenml.enums import ModelStages
 from zenml.logger import get_logger
-from zenml.model import ModelConfig
 
-from pipelines import (
-    sentinment_analysis_deploy_pipeline,
-    sentinment_analysis_feature_engineering_pipeline,
-    sentinment_analysis_promote_pipeline,
-    sentinment_analysis_training_pipeline,
-)
+from pipelines.finetune import finetuning_pipeline
 
 logger = get_logger(__name__)
 
@@ -80,109 +70,43 @@ Examples:
     help="Number of epochs to train the model for.",
 )
 @click.option(
-    "--train-batch-size",
-    default=8,
-    type=click.INT,
-    help="Batch size for training the model.",
-)
-@click.option(
-    "--eval-batch-size",
-    default=8,
-    type=click.INT,
-    help="Batch size for evaluating the model.",
-)
-@click.option(
-    "--learning-rate",
-    default=2e-5,
-    type=click.FLOAT,
-    help="Learning rate for training the model.",
-)
-@click.option(
-    "--weight-decay",
-    default=0.01,
-    type=click.FLOAT,
-    help="Weight decay for training the model.",
-)
-@click.option(
-    "--max-seq-length",
-    default=512,
-    type=click.INT,
-    help="The maximum total input sequence length after tokenization.",
-)
-@click.option(
-    "--dataset-name",
-    default="tokenized_dataset",
-    type=click.STRING,
-    help="The name of the dataset produced by feature engineering.",
-)
-@click.option(
-    "--dataset-version-name",
-    default=None,
-    type=click.STRING,
-    help="Version of the dataset produced by feature engineering. "
-    "If not specified, the a new version will be used.",
-)
-@click.option(
-    "--feature-pipeline",
+    "--finetune-pipeline",
     is_flag=True,
     default=False,
     help="Whether to run the pipeline that creates the dataset.",
 )
 @click.option(
-    "--training-pipeline",
+    "--agent-creation-pipeline",
     is_flag=True,
     default=False,
     help="Whether to run the pipeline that trains the model.",
 )
 @click.option(
-    "--dataset-artifact-id",
-    default=None,
+    "--website-url",
+    default="https://zenml.io",
     type=click.STRING,
-    help="Dataset artifact id to use for training. If not specified, "
-    "the latest version will be used.",
+    help="URL of the website you'd like to train on.",
 )
 @click.option(
-    "--tokenizer-artifact-id",
-    default=None,
+    "--model-id",
+    default="paraphrase-albert-small-v2",
     type=click.STRING,
-    help="Tokenizer artifact id to use for training. If not specified, "
-    "the latest version will be used.",
+    help="Name of the Sentence Transformers Model to finetune.",
 )
 @click.option(
-    "--promoting-pipeline",
-    is_flag=True,
-    default=False,
-    help="Whether to run the pipeline that promotes the model to staging.",
-)
-@click.option(
-    "--deploying-pipeline",
-    is_flag=True,
-    default=False,
-    help="Whether to run the pipeline that deploys the model to selected deployment platform.",
-)
-@click.option(
-    "--zenml-model-name",
-    default="distil_bert_sentiment_analysis",
-    type=click.STRING,
-    help="Name of the ZenML Model.",
+    "--model-version",
+    default=0,
+    type=click.INT,
+    help="Version of the model to be used for agent.",
 )
 def main(
     no_cache: bool = True,
-    num_epochs: int = 3,
-    train_batch_size: int = 8,
-    eval_batch_size: int = 8,
-    learning_rate: float = 2e-5,
-    weight_decay: float = 0.01,
-    max_seq_length: int = 512,
-    dataset_artifact_id: Optional[str] = None,
-    tokenizer_artifact_id: Optional[str] = None,
-    dataset_name: str = "tokenized_dataset",
-    dataset_version_name: Optional[str] = None,
-    feature_pipeline: bool = False,
-    training_pipeline: bool = False,
-    promoting_pipeline: bool = False,
-    deploying_pipeline: bool = False,
-    zenml_model_name: str = "distil_bert_sentiment_analysis",
+    num_epochs: int = 1,
+    finetune_pipeline: bool = False,
+    agent_creation_pipeline: bool = False,
+    model_id: str = "paraphrase-albert-small-v2",
+    model_version: int = 0,
+    website_url: str = "https://zenml.io",
 ):
     """Main entry point for the pipeline execution.
 
@@ -200,14 +124,6 @@ def main(
             os.path.dirname(os.path.realpath(__file__)),
             "configs",
     )
-    model_config = ModelConfig(
-        name=zenml_model_name,
-        license="Apache 2.0",
-        description="Show case Model Control Plane.",
-        create_new_model_version=True,
-        delete_new_version_on_failure=True,
-        tags=["sentiment_analysis", "huggingface"],
-    )
 
     pipeline_args = {}
 
@@ -215,95 +131,31 @@ def main(
         pipeline_args["enable_cache"] = False
 
     # Execute Feature Engineering Pipeline
-    if feature_pipeline:
-        pipeline_args["model_config"] = model_config
-        pipeline_args["config_path"] = os.path.join(config_folder, "feature_engineering_config.yaml")
-        run_args_feature = {
-            "max_seq_length": max_seq_length,
+    if finetune_pipeline:
+        # pipeline_args["config_path"] = os.path.join(config_folder, "feature_engineering_config.yaml")
+        run_args_finetune = {
+            "model_id": model_id,
+            "num_epochs": num_epochs,
+            "website_url": website_url,
         }
-        pipeline_args[
-            "run_name"
-        ] = f"sentinment_analysis_feature_engineering_pipeline_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
-        sentinment_analysis_feature_engineering_pipeline.with_options(**pipeline_args)(
-            **run_args_feature
+        finetuning_pipeline.with_options(**pipeline_args)(
+            **run_args_finetune
         )
-        logger.info("Feature Engineering pipeline finished successfully!")
+        logger.info("Finetuning pipeline finished successfully!")
 
     # Execute Training Pipeline
-    if training_pipeline:
-        pipeline_args["config_path"] = os.path.join(config_folder, "trainer_config.yaml")
+    if agent_creation_pipeline:
+        # pipeline_args["config_path"] = os.path.join(config_folder, "trainer_config.yaml")
 
-        run_args_train = {
-            "num_epochs": num_epochs,
-            "train_batch_size": train_batch_size,
-            "eval_batch_size": eval_batch_size,
-            "learning_rate": learning_rate,
-            "weight_decay": weight_decay,
-            "max_seq_length": max_seq_length,
-            "dataset_artifact_id": dataset_artifact_id,
-            "tokenizer_artifact_id": tokenizer_artifact_id,
+        run_args_agent = {
+            "website_url": website_url,
+            "model_version": model_version,
         }
 
-        # If dataset_version_name is specified, use versioned artifacts
-        if dataset_version_name:
-            client = Client()
-            tokenized_dataset_artifact = client.get_artifact(
-                dataset_name, dataset_version_name
-            )
-            # base tokenizer is always the same version
-            # as the dataset version
-            tokenized_tokenizer_artifact = client.get_artifact(
-                "base_tokenizer", dataset_version_name
-            )
-            # Use versioned artifacts
-            run_args_train["dataset_artifact_id"] = tokenized_dataset_artifact.id
-            run_args_train["tokenizer_artifact_id"] = tokenized_tokenizer_artifact.id
-
-        pipeline_args["model_config"] = model_config
-
-        pipeline_args[
-            "run_name"
-        ] = f"sentinment_analysis_training_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
-
-        sentinment_analysis_training_pipeline.with_options(**pipeline_args)(
-            **run_args_train
+        agent_creation_pipeline.with_options(**pipeline_args)(
+            **run_args_agent
         )
-        logger.info("Training pipeline finished successfully!")
-
-    # Execute Promoting Pipeline
-    if promoting_pipeline:
-        run_args_promoting = {}
-        model_config = ModelConfig(name=zenml_model_name)
-        pipeline_args["config_path"] = os.path.join(config_folder, "promoting_config.yaml")
-
-        pipeline_args["model_config"] = model_config
-
-        pipeline_args[
-            "run_name"
-        ] = f"sentinment_analysis_promoting_pipeline_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
-        sentinment_analysis_promote_pipeline.with_options(**pipeline_args)(
-            **run_args_promoting
-        )
-        logger.info("Promoting pipeline finished successfully!")
-
-    if deploying_pipeline:
-        pipeline_args["config_path"] = os.path.join(config_folder, "deploying_config.yaml")
-
-        # Deploying pipeline has new ZenML model config
-        model_config = ModelConfig(
-            name=zenml_model_name,
-            version=ModelStages.PRODUCTION,
-        )
-        pipeline_args["model_config"] = model_config
-        pipeline_args["enable_cache"] = False
-        run_args_deploying = {}
-        pipeline_args[
-            "run_name"
-        ] = f"sentinment_analysis_deploy_pipeline_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
-        sentinment_analysis_deploy_pipeline.with_options(**pipeline_args)(
-            **run_args_deploying
-        )
-        logger.info("Deploying pipeline finished successfully!")
+        logger.info("Agent creation pipeline finished successfully!")
 
 
 if __name__ == "__main__":
