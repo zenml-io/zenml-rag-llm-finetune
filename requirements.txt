@@ -1,9 +1,8 @@
 zenml[server]==0.47.0
-openai==0.28
-llama-index==0.8.5.post2
+openai
+llama-index
 sentence-transformers==2.2.2
 html2text
-langchain==0.0.263
-faiss-cpu==1.7.3
-unstructured==0.5.7
+unstructured
 tiktoken
+llama-hub
