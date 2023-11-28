@@ -4,6 +4,7 @@ from pydantic import BaseModel, Extra, Field
 from sentence_transformers import SentenceTransformer
 
 from langchain.embeddings.base import Embeddings
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
 DEFAULT_BGE_MODEL = "BAAI/bge-large-en"
 DEFAULT_QUERY_BGE_INSTRUCTION_EN = (

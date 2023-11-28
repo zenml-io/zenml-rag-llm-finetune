@@ -34,7 +34,7 @@ DEFAULT_FILENAME = "agent.pkl"
 DEFAULT_PYTHON_VERSION_FILENAME = "python_version.txt"
 
 
-class AgentExecutorMaterializer(BaseMaterializer):
+class AgentMaterializer(BaseMaterializer):
     """Materializer using pickle.
 
     This materializer can materialize (almost) any object, but does so in a
