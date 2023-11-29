@@ -37,7 +37,7 @@ docker_settings = DockerSettings(
 @pipeline(
     name=PIPELINE_NAME,
     enable_cache=True,
-    settings=docker_settings,
+    settings={"docker": docker_settings},
     model_version=ModelVersion(
         name="finetuned-sentence-transformer",
     ),

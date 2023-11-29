@@ -10,11 +10,19 @@ from steps.finetune_pipeline.finetune_embeddings import (
 )
 from steps.finetune_pipeline.query_generator import generate_queries
 from steps.finetune_pipeline.training_examples import generate_training_examples
+from zenml.config import DockerSettings
+from zenml.integrations.constants import OPEN_AI, PILLOW
 
+
+docker_settings = DockerSettings(
+    requirements="requirements.txt",
+    required_integrations=[OPEN_AI, PILLOW],
+)
 
 @pipeline(
     name="finetuning_pipeline",
     enable_cache=True,
+    settings={"docker": docker_settings},
     model_version=ModelVersion(
         name="finetuned-sentence-transformer",
         license="Apache",
