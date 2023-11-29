@@ -13,9 +13,11 @@
 #  permissions and limitations under the License.
 
 
-from typing import Optional
 from steps.agent_creation.agent_creator import agent_creator
+from steps.agent_creation.evaluator import evaluate_vector_stores
 from steps.agent_creation.index_generator import index_generator
+from steps.agent_creation.index_generator2 import index_generator2
+from steps.agent_creation.metrics import generate_metrics
 from steps.agent_creation.url_scraper.url_scraper import url_scraper
 from steps.agent_creation.web_url_loader import web_url_loader
 from zenml import pipeline, get_pipeline_context
@@ -23,7 +25,6 @@ from zenml.artifacts.external_artifact import ExternalArtifact
 from zenml.config import DockerSettings
 from zenml.integrations.constants import OPEN_AI, PILLOW
 from zenml.model.model_version import ModelVersion
-from sentence_transformers import SentenceTransformer
 
 PIPELINE_NAME = "zenml_agent_creation_pipeline"
 
@@ -47,7 +48,7 @@ def docs_to_agent_pipeline(
     repo_url: str = "",
     release_notes_url: str = "",
     website_url: str = "",
-    model_version: int = None
+    model_version: int = None,
 ) -> None:
     """Generate index for ZenML.
 
@@ -61,10 +62,28 @@ def docs_to_agent_pipeline(
     urls = url_scraper(docs_url, repo_url, release_notes_url, website_url)
     documents = web_url_loader(urls)
     trained_embeddings = get_pipeline_context().extra["trained_embeddings"]
-    vector_store = index_generator(
+    enhanced_vector_store = index_generator(
         model=ExternalArtifact(
             name=trained_embeddings,
         ),
         documents=documents,
+        id="enhanced_index_generator",
     )
-    agent = agent_creator(vector_store=vector_store)
+    standard_vector_store = index_generator2(
+        documents=documents,
+        id="standard_index_generator",
+    )
+    finetuned_results, standard_results = evaluate_vector_stores(
+        enhanced_vector_store=enhanced_vector_store,
+        standard_vector_store=standard_vector_store,
+        id="evaluator",
+    )
+    finetuned_hits, standard_hits = generate_metrics(
+        finetuned_results, standard_results, id="metrics"
+    )
+    finetuned_agent = agent_creator(
+        vector_store=enhanced_vector_store, id="finetuned_agent_creator"
+    )
+    standard_agent = agent_creator(
+        vector_store=standard_vector_store, id="standard_agent_creator"
+    )
