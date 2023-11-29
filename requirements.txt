@@ -1,4 +1,4 @@
-zenml[server]==0.47.0
+zenml[server]==0.50.0
 openai
 llama-index
 sentence-transformers==2.2.2

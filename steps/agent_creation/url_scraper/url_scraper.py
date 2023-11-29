@@ -15,6 +15,10 @@
 from typing import List
 
 from zenml import step
+from steps.agent_creation.url_scraper.url_scraping_utils import (
+    get_all_pages,
+    get_nested_readme_urls,
+)
 
 
 @step(enable_cache=True)
@@ -36,8 +40,6 @@ def url_scraper(
         List of URLs to scrape.
     """
     # examples_readme_urls = get_nested_readme_urls(repo_url)
-    # docs_urls = get_all_pages(docs_url)
-    # website_urls = get_all_pages(website_url)
-    # return docs_urls
-    # return docs_urls + website_urls + [release_notes_url]
-    return [website_url]
+    docs_urls = get_all_pages(docs_url)
+    website_urls = get_all_pages(website_url)
+    return docs_urls + website_urls + [release_notes_url]

@@ -37,14 +37,14 @@ def url_scraper(
         List of URLs to scrape.
     """
     # examples_readme_urls = get_nested_readme_urls(repo_url)
-    # docs_urls = get_all_pages(docs_url, finetuning=True)
-    # website_urls = get_all_pages(website_url, finetuning=True)
-    # all_urls = docs_urls + website_urls + [release_notes_url]
+    docs_urls = get_all_pages(docs_url, finetuning=True)
+    website_urls = get_all_pages(website_url, finetuning=True)
+    all_urls = docs_urls + website_urls + [release_notes_url]
 
-    # # split into train and val sets
-    # train_urls = all_urls[: int(0.8 * len(all_urls))]
-    # val_urls = all_urls[int(0.8 * len(all_urls)) :]
+    # split into train and val sets
+    train_urls = all_urls[: int(0.8 * len(all_urls))]
+    val_urls = all_urls[int(0.8 * len(all_urls)) :]
 
-    return [website_url], [website_url]
+    # return [website_url], [website_url]
 
     return train_urls, val_urls

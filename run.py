@@ -117,6 +117,8 @@ def main(
         (some of which may come from command line arguments)
       * launching the pipeline
     """
+    from zenml.config import DockerSettings
+    from zenml.integrations.constants import OPEN_AI, PILLOW, GCP
 
     # Run a pipeline with the required parameters. This executes
     # all steps in the pipeline in the correct order using the orchestrator
@@ -127,6 +129,11 @@ def main(
     )
 
     pipeline_args = {}
+    docker_settings = DockerSettings(
+        requirements="requirements.txt",
+        required_integrations=[OPEN_AI, PILLOW, GCP],
+        environment={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")},
+    )
 
     if no_cache:
         pipeline_args["enable_cache"] = False
@@ -147,6 +154,7 @@ def main(
             "num_epochs": num_epochs,
             "website_url": website_url,
         }
+        pipeline_args["settings"] = {"docker": docker_settings}
         finetuning_pipeline.with_options(**pipeline_args)(
             **run_args_finetune
         )
@@ -160,6 +168,7 @@ def main(
         )
         # pipeline_args["config_path"] = os.path.join(config_folder, "trainer_config.yaml")
         pipeline_args["model_version"] = model_version_config_agent
+        pipeline_args["settings"] = {"docker": docker_settings}
 
         run_args_agent = {
             "website_url": website_url,

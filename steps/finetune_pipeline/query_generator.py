@@ -18,7 +18,8 @@ def generate_queries(
     Automatically generate hypothetical questions that could be answered with
     doc in the corpus.
     """
-    llm = OpenAI(model="gpt-3.5-turbo", api_key="API_KEY")
+    import os
+    llm = OpenAI(model="gpt-3.5-turbo", api_key=os.getenv("OPENAI_API_KEY"))
 
     prompt_template = (
         prompt_template
