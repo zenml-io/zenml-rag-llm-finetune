@@ -18,6 +18,7 @@ from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
+from requests.exceptions import MissingSchema
 
 logger = getLogger(__name__)
 
@@ -47,8 +48,13 @@ def get_all_links(url: str, base: str) -> List[str]:
 
     Returns:
         List[str]: A list of valid links with the same base.
+
     """
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except MissingSchema:
+        logger.debug(f"Invalid URL: {url}")
+        return []
     soup = BeautifulSoup(response.text, "html.parser")
     links = []
 
@@ -79,9 +85,16 @@ def crawl(url: str, base: str, visited: Set[str] = None, finetuning: bool = Fals
     if visited is None:
         visited = set()
 
+    if url is "" or url in visited:
+        return visited
+
     # if we have visited 10 pages, stop crawling
     if finetuning and len(visited) == 10:
         return visited
+
+    # if a scheme is missing, add https://
+    if not urlparse(url).scheme:
+        url = f"https://{url}"
 
     visited.add(url)
     links = get_all_links(url, base)
