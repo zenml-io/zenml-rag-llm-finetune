@@ -1,4 +1,5 @@
-from typing import Annotated, Optional
+from typing import Optional
+from typing_extensions import Annotated
 from sentence_transformers import SentenceTransformer, losses
 from torch.utils.data import DataLoader
 from sentence_transformers.evaluation import InformationRetrievalEvaluator

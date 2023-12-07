@@ -12,7 +12,8 @@
 #  or implied. See the License for the specific language governing
 #  permissions and limitations under the License.
 
-from typing import Annotated, List, Tuple
+from typing import List, Tuple
+from typing_extensions import Annotated
 
 from steps.finetune_pipeline.url_scraper.url_scraping_utils import get_all_pages, get_nested_readme_urls
 from zenml import step
