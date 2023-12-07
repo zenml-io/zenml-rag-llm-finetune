@@ -130,8 +130,9 @@ def main(
 
     pipeline_args = {}
     docker_settings = DockerSettings(
-        requirements="requirements.txt",
-        required_integrations=[OPEN_AI, PILLOW, GCP],
+        build_context_root=".",
+        dockerfile="Dockerfile",
+        required_integrations=[PILLOW, GCP],
         environment={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")},
     )
 

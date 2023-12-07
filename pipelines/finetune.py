@@ -1,3 +1,4 @@
+import os
 from zenml import pipeline
 from zenml.model.model_version import ModelVersion
 
@@ -15,8 +16,10 @@ from zenml.integrations.constants import OPEN_AI, PILLOW
 
 
 docker_settings = DockerSettings(
-    requirements="requirements.txt",
-    required_integrations=[OPEN_AI, PILLOW],
+    build_context_root=".",
+    dockerfile="Dockerfile",
+    required_integrations=[PILLOW],
+    environment={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")},
 )
 
 @pipeline(

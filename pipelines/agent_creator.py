@@ -13,6 +13,7 @@
 #  permissions and limitations under the License.
 
 
+import os
 from steps.agent_creation.agent_creator import agent_creator
 from steps.agent_creation.evaluator import evaluate_vector_stores
 from steps.agent_creation.index_generator import index_generator
@@ -29,8 +30,10 @@ from zenml.model.model_version import ModelVersion
 PIPELINE_NAME = "zenml_agent_creation_pipeline"
 
 docker_settings = DockerSettings(
-    requirements="requirements.txt",
-    required_integrations=[OPEN_AI, PILLOW],
+    build_context_root=".",
+    dockerfile="Dockerfile",
+    required_integrations=[PILLOW],
+    environment={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")},
 )
 
 
